@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme variables based on data-theme attribute */
+[data-theme="light"] {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+[data-theme="dark"] {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+/* Fallback for systems that prefer dark mode */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --foreground

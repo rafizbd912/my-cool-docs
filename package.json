@@ -1,0 +1,28 @@
+{
+  "name": "docs-site",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "rafiz-changelog-maker": "src/cli.js"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "changelog": "node src/cli.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.2",
+    "commander": "^11.1.0",
+    "next": "14.2.5",
+    "openai": "^4.28.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.13",
+    "@types/node": "^20.14.10",
+    "@ty
