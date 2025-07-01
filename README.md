@@ -3,6 +3,10 @@
 > AI-powered CLI **and** sleek Next.js viewer for beautifully formatted changelogs.
 
 ---
+## 🎥 Demo
+
+Watch the demo video: [rafiz-changelog-maker walk-through](https://drive.google.com/file/d/1hIvVQxyaGy-qwsv5wmGYMdfb8gqPGwlL/view?usp=sharing)
+
 
 ## ✨ What you get
 
