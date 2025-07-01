@@ -22,4 +22,35 @@
 /* Fallback for systems that prefer dark mode */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --foreground
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+    --background: #000000;
+    --foreground: #ffffff;
+  }
+}
+
+/* Default light theme for root without data-theme */
+:root:not([data-theme]) {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+} 

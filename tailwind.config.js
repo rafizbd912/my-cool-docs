@@ -12,4 +12,10 @@ module.exports = {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
         brand: '#14b8a6',
-      
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
+} 

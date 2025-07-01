@@ -15,4 +15,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
- 
+  return (
+    <html lang="en" data-theme="light">
+      <body className={inter.className}>
+        {/* LayoutWrapper wraps every page - equivalent to _app.js Layout wrapper */}
+        <LayoutWrapper>{children}</LayoutWrapper>
+      </body>
+    </html>
+  )
+} 

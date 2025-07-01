@@ -1,42 +1,63 @@
-export default function Home() {
+import fs from 'fs'
+import path from 'path'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { Metadata } from 'next'
+
+// App Router equivalent of getStaticProps - this runs at build time
+async function getChangelogContent() {
+  try {
+    const changelogPath = path.join(process.cwd(), 'CHANGELOG.md')
+    const content = fs.readFileSync(changelogPath, 'utf8')
+    return content
+  } catch (error) {
+    console.error('Error reading CHANGELOG.md:', error)
+    return '# Changelog\n\nChangelog file not found.'
+  }
+}
+
+export const metadata: Metadata = {
+  title: 'Changelog - rafiz-changelog-maker',
+  description: 'AI-powered changelog generator for Git repositories',
+}
+
+export default async function Home() {
+  // This is the App Router equivalent of getStaticProps
+  // The file is read at build time (or request time in dev)
+  const changelogContent = await getChangelogContent()
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-12">
         <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-          Welcome to docs-site
+          rafiz-changelog-maker
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl">
-          A modern documentation site built with Next.js 14, Tailwind CSS, and the typography plugin.
-          Features a responsive layout with dark mode support.
+          AI-powered changelog generator that transforms Git commits into beautiful, organized changelogs.
         </p>
       </div>
 
-      <div className="prose prose-lg max-w-none dark:prose-invert">
-        <h2>🚀 Getting Started</h2>
-        <p>
-          This is your new documentation site! The layout includes a fixed header, responsive sidebar, 
-          and this main content area with <code>px-4 py-8</code> spacing as requested.
+      {/* React Markdown with GFM support and prose styling */}
+      <article className="prose lg:prose-xl mx-auto dark:prose-invert max-w-none">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+        >
+          {changelogContent}
+        </ReactMarkdown>
+      </article>
+
+      {/* CLI Usage hint */}
+      <div className="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 rounded-r-lg">
+        <h3 className="text-blue-800 dark:text-blue-300 font-semibold mb-2">
+          🚀 Generate Your Own Changelog
+        </h3>
+        <p className="text-blue-700 dark:text-blue-300 mb-3">
+          Use the CLI tool to generate changelogs from any Git repository:
         </p>
-
-        <h3>✨ Layout Features</h3>
-        <ul>
-          <li><strong>Fixed Header</strong> - 64px tall with subtle shadow and dark mode support</li>
-          <li><strong>Responsive Sidebar</strong> - Hidden on mobile, toggleable with burger menu</li>
-          <li><strong>Dark Mode Toggle</strong> - Click the icon in the header to switch themes</li>
-          <li><strong>Mobile First</strong> - Fully responsive design with Tailwind CSS</li>
-        </ul>
-
-        <h3>🎨 Design System</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 not-prose">
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Brand Color</h4>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-brand rounded"></div>
-              <code className="text-sm text-gray-600 dark:text-gray-300">#14b8a6</code>
-            </div>
-          </div>
-          
-          <div className="p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Typography</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              Uses the @tailwindcss
+        <pre className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded text-blue-800 dark:text-blue-200 text-sm overflow-x-auto">
+          <code>npx rafiz-changelog-maker --repo owner/repo --max 100 &gt; CHANGELOG.md</code>
+        </pre>
+      </div>
+    </div>
+  )
+} 

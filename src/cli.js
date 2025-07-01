@@ -12,9 +12,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Initialize Octokit
+// Initialize Octokit with timeout
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
+  request: {
+    timeout: 30000, // 30 seconds timeout
+  },
 });
 
 async function generateChangelog(repo, maxCommits) {
@@ -46,22 +49,60 @@ async function generateChangelog(repo, maxCommits) {
 
     console.error(`Processing ${maxCommits ? Math.min(maxCommits, commits.length) : commits.length} commits...`);
 
+    console.error('🤖 Generating changelog with OpenAI...');
+    
+    const SYSTEM_PROMPT = `
+You are an expert changelog writer. Produce a Markdown “# Changelog” that mirrors Stripe’s style as closely as possible:
+
+1. **Page header & blurb**  
+   - Start with “# Changelog”  
+   - Add a one-sentence summary line: e.g. “Keep track of changes and upgrades to the API.”
+
+2. **Version sections**  
+   - Use “## <version> – YYYY-MM-DD” headings (if you can't find the version, use the date, and vice versa)
+   - Order versions newest-first  
+
+3. **Standard sub-headings**  
+   Under each “##” give sections such as:  
+   - “### What’s new” (for brand-new features)  
+   - “### Enhancements” (for improvements)  
+   - “### Bug fixes”  
+   - “### Deprecations” or “### Breaking changes” (if needed)
+
+4. **Tables for API-style changes**  
+   - Whenever you describe added/removed parameters, render a Markdown table with columns like **Parameter | Change | Notes**
+
+5. **Upgrade notes**  
+   - If any change requires user action, add a short “#### Upgrade” bullet list:
+     1. Step-by-step instruction  
+     2. Example CLI or header settings  
+
+6. **Keep bullets concise & user-focused**  
+   - No raw commit hashes or internal jargon  
+   - Merge similar items into one line  
+`;
+
     // Generate changelog with OpenAI
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a helpful assistant that creates clean, organized changelogs. Convert the given commit messages into a bullet-style changelog starting with "# Changelog". Group similar changes together and use clear, user-friendly language. Focus on features, fixes, and improvements that users would care about.'
-        },
-        {
-          role: 'user',
-          content: `Please convert these commit messages into a clean changelog:\n\n${commitMessages}`
-        }
-      ],
-      max_tokens: 1000,
-      temperature: 0.3,
-    });
+    const response = await Promise.race([
+      openai.chat.completions.create({
+        model: 'gpt-4.1',  // gpt-4o-mini
+        messages: [
+          {
+            role: 'system',
+            content: SYSTEM_PROMPT.trim()
+          },
+          {
+            role: 'user',
+            content: `Here are ${maxCommits ? Math.min(maxCommits, commits.length) : commits.length} recent commit messages from ${repo}:\n\n${commitMessages}`
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.25,
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('OpenAI API request timed out after 60 seconds')), 60000)
+      )
+    ]);
 
     const changelog = response.choices[0]?.message?.content;
     
@@ -88,12 +129,17 @@ program
   .action(async (options) => {
     // Validate environment variables
     if (!process.env.OPENAI_API_KEY) {
-      console.error('Error: OPENAI_API_KEY environment variable is required');
+      console.error('❌ Error: OPENAI_API_KEY environment variable is required');
+      console.error('💡 Get your API key from: https://platform.openai.com/api-keys');
+      console.error('📝 Set it with: export OPENAI_API_KEY="your_key_here"');
       process.exit(1);
     }
 
     if (!process.env.GITHUB_TOKEN) {
-      console.error('Error: GITHUB_TOKEN environment variable is required');
+      console.error('❌ Error: GITHUB_TOKEN environment variable is required');
+      console.error('💡 Get your token from: https://github.com/settings/tokens');
+      console.error('📝 Set it with: export GITHUB_TOKEN="your_token_here"');
+      console.error('ℹ️  For public repos, just needs "public_repo" scope');
       process.exit(1);
     }
 

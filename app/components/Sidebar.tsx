@@ -6,10 +6,7 @@ import Link from 'next/link'
 
 // Export nav links array
 export const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/contributing', label: 'Contributing' },
-  { href: '/changelog', label: 'Changelog' }
+  { href: '/', label: 'Changelog' }
 ]
 
 interface SidebarProps {
