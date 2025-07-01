@@ -17,22 +17,36 @@ interface SidebarProps {
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   // const pathname = usePathname()
 
-  const [navLinks, setNavLinks] = useState<NavLink[]>([])
+  const [navLinks, setNavLinks] = useState<NavLink[]>([{ href: '#changelog', label: 'Overview' }])
+
+  const currentHash = typeof window !== 'undefined' ? window.location.hash : ''
 
   // Build nav links from h2 headings within the article
   useEffect(() => {
-    const article = document.querySelector('article')
-    if (!article) return
+    const buildLinks = () => {
+      const article = document.querySelector('article')
+      if (!article) return false
 
-    const headings = Array.from(article.querySelectorAll('h2')) as HTMLElement[]
-    const links: NavLink[] = headings.map((h) => {
-      const id = h.id || h.textContent?.replace(/\s+/g, '-').toLowerCase() || ''
-      if (!h.id) h.id = id
-      return { href: `#${id}`, label: h.textContent || '' }
-    })
+      const headings = Array.from(article.querySelectorAll('h2')) as HTMLElement[]
+      if (headings.length === 0) return false
 
-    // Always include top link to main title
-    setNavLinks([{ href: '#changelog', label: 'Overview' }, ...links])
+      const links: NavLink[] = headings.map((h) => {
+        const id = h.id || h.textContent?.replace(/\s+/g, '-').toLowerCase() || ''
+        if (!h.id) h.id = id
+        return { href: `#${id}`, label: h.textContent || '' }
+      })
+
+      setNavLinks([{ href: '#changelog', label: 'Overview' }, ...links])
+      return true
+    }
+
+    // Try immediately and then keep trying until headings discovered
+    if (!buildLinks()) {
+      const id = setInterval(() => {
+        if (buildLinks()) clearInterval(id)
+      }, 300)
+      return () => clearInterval(id)
+    }
   }, [])
 
   // Close sidebar when pressing escape
@@ -76,7 +90,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <nav className="flex-1 p-4">
             <div className="space-y-1">
               {navLinks.map((link) => {
-                const isActive = (typeof window !== 'undefined' ? window.location.hash === link.href : false) || (link.href === '#changelog' && !window.location.hash)
+                const isActive = currentHash === link.href || (link.href === '#changelog' && currentHash === '')
                 return (
                   <Link
                     key={link.href}
@@ -101,12 +115,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           </nav>
 
-          {/* Footer */}
-          <div className="p-4 border-t border-gray-700">
-            <p className="text-sm text-gray-400">
-              Built with Next.js 14
-            </p>
-          </div>
+          {/* Footer removed */}
         </div>
       </aside>
     </>

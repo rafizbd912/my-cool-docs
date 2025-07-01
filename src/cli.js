@@ -119,6 +119,11 @@ You are an expert changelog writer. Produce a Markdown “# Changelog” that mi
 6. **Keep bullets concise & user-focused**  
    - No raw commit hashes or internal jargon  
    - Merge similar items into one line  
+
+   7. **Where relevant, add links to related PRs or issue numbers. Example:
+   - **Hydration Fixes**: Fixed hydration issues with \`useId\` in SuspenseList. See [#432](https://github.com/yourrepo/yourproject/pull/432) for details.
+
+
 `;
 
     // Generate changelog with OpenAI
