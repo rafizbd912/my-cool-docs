@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // chmod +x src/cli.js
+// 07-01-0425
 
 const { Command } = require('commander');
 const { Octokit } = require('@octokit/rest');
@@ -20,7 +21,7 @@ const octokit = new Octokit({
   },
 });
 
-async function generateChangelog(repo, maxCommits) {
+async function generateChangelog(repo, maxCommits, sinceDate, untilDate) {
   try {
     const [owner, repoName] = repo.split('/');
     
@@ -28,14 +29,52 @@ async function generateChangelog(repo, maxCommits) {
       throw new Error('Repository must be in format "owner/repo"');
     }
 
-    console.error(`Fetching commits from ${repo}...`);
+    // Helper function to convert date strings to ISO format
+    const formatDate = (dateStr) => {
+      if (!dateStr) return undefined;
+      
+      // If already in ISO format, return as-is
+      if (dateStr.includes('T')) return dateStr;
+      
+      // Convert simple date (YYYY-MM-DD) to ISO format
+      try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+          throw new Error(`Invalid date format: ${dateStr}`);
+        }
+        return date.toISOString();
+      } catch (error) {
+        throw new Error(`Invalid date format: ${dateStr}. Use YYYY-MM-DD or ISO 8601 format`);
+      }
+    };
+
+    const since = formatDate(sinceDate);
+    const until = formatDate(untilDate);
+
+    // Build date filter message
+    let dateFilter = '';
+    if (since && until) {
+      dateFilter = ` from ${sinceDate} to ${untilDate}`;
+    } else if (since) {
+      dateFilter = ` since ${sinceDate}`;
+    } else if (until) {
+      dateFilter = ` until ${untilDate}`;
+    }
+
+    console.error(`Fetching commits from ${repo}${dateFilter}...`);
     
-    // Fetch commits from GitHub
-    const { data: commits } = await octokit.rest.repos.listCommits({
+    // Build GitHub API parameters
+    const apiParams = {
       owner,
       repo: repoName,
       per_page: maxCommits || 100,
-    });
+    };
+    
+    if (since) apiParams.since = since;
+    if (until) apiParams.until = until;
+    
+    // Fetch commits from GitHub
+    const { data: commits } = await octokit.rest.repos.listCommits(apiParams);
 
     if (commits.length === 0) {
       throw new Error('No commits found in repository');
@@ -85,7 +124,7 @@ You are an expert changelog writer. Produce a Markdown “# Changelog” that mi
     // Generate changelog with OpenAI
     const response = await Promise.race([
       openai.chat.completions.create({
-        model: 'gpt-4.1',  // gpt-4o-mini
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
@@ -126,6 +165,8 @@ program
   .version('1.0.0')
   .requiredOption('-r, --repo <owner/repo>', 'GitHub repository in format "owner/repo"')
   .option('-m, --max <number>', 'Maximum number of commits to process', parseInt)
+  .option('-s, --since <date>', 'Only commits after this date (YYYY-MM-DD or ISO 8601)')
+  .option('-u, --until <date>', 'Only commits before this date (YYYY-MM-DD or ISO 8601)')
   .action(async (options) => {
     // Validate environment variables
     if (!process.env.OPENAI_API_KEY) {
@@ -143,7 +184,7 @@ program
       process.exit(1);
     }
 
-    await generateChangelog(options.repo, options.max);
+    await generateChangelog(options.repo, options.max, options.since, options.until);
   });
 
 // Handle unhandled rejections gracefully

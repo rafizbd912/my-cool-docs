@@ -1,21 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: ['attribute', 'data-theme', 'dark'],
+  darkMode: ['attribute', 'data-theme', 'dark'], // enabled via data-theme="dark" or daisyUI theme
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
         brand: '#14b8a6',
       },
     },
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('daisyui'),
   ],
-} 
+  daisyui: {
+    themes: ['forest'],
+  },
+}

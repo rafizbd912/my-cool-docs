@@ -6,8 +6,8 @@ import LayoutWrapper from './components/LayoutWrapper'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'docs-site',
-  description: 'A modern documentation site built with Next.js 14',
+  title: 'rafiz-changelog-maker',
+  description: 'AI-powered changelog generator and viewer',
 }
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="forest">
       <body className={inter.className}>
         {/* LayoutWrapper wraps every page - equivalent to _app.js Layout wrapper */}
         <LayoutWrapper>{children}</LayoutWrapper>

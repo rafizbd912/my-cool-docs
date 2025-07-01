@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Header from './Header'
 import Sidebar from './Sidebar'
-import ThemeProvider from './ThemeProvider'
 
 interface LayoutWrapperProps {
   children: React.ReactNode
@@ -22,29 +21,27 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   }
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Header */}
-        <Header onToggleSidebar={toggleSidebar} />
+    <div className="min-h-screen bg-gray-900 text-gray-100">
+      {/* Header */}
+      <Header onToggleSidebar={toggleSidebar} />
+      
+      <div className="flex pt-16"> {/* pt-16 to account for fixed header */}
+        {/* Sidebar */}
+        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         
-        <div className="flex pt-16"> {/* pt-16 to account for fixed header */}
-          {/* Sidebar */}
-          <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-          
-          {/* Main Content */}
-          <main className="flex-1 px-4 py-8 lg:ml-64 transition-all duration-300">
-            {children}
-          </main>
-        </div>
-        
-        {/* Overlay for mobile sidebar */}
-        {isSidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
+        {/* Main Content */}
+        <main className="flex-1 px-4 py-8 lg:ml-64 transition-all duration-300">
+          {children}
+        </main>
       </div>
-    </ThemeProvider>
+      
+      {/* Overlay for mobile sidebar */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+    </div>
   )
 } 
