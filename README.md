@@ -1,114 +1,90 @@
-# docs-site
+# rafiz-changelog-maker
 
-A modern documentation site built with Next.js 14, Tailwind CSS, and typography plugin. Also includes a CLI tool for generating AI-powered changelogs from Git commits.
+> AI-powered CLI **and** sleek Next.js viewer for beautifully formatted changelogs.
 
-## Getting Started
+---
 
-First, install the dependencies:
+## ✨ What you get
 
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-```
+| Part | Purpose |
+|------|---------|
+| **`src/cli.js`** | Node CLI that fetches Git commits, sends them to OpenAI, and prints a Stripe-style `CHANGELOG.md`. |
+| **`app/`**      | Next 14 + Tailwind + daisyUI app that renders that markdown as a dark-themed docs site. |
 
-Then, run the development server:
+## 📦 Requirements
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+* Node ≥ 18
+* An **OpenAI API key** – `OPENAI_API_KEY`
+* A **GitHub token** – `GITHUB_TOKEN` (<https://github.com/settings/tokens>)  
+  * Public repos → `public_repo` scope is enough  
+  * Private repos → `repo` scope
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-## CLI Tool: rafiz-changelog-maker
+## 🚀 Quick-start (clone-and-run workflow)
 
-Generate beautiful changelogs from Git commits using AI!
-
-### Setup
-
-1. Set environment variables:
-   ```bash
-   export OPENAI_API_KEY="your_openai_api_key"
-   export GITHUB_TOKEN="your_github_personal_access_token"
-   ```
-
-2. Make the CLI executable:
-   ```bash
-   chmod +x src/cli.js
-   ```
-
-### Usage
+We'll demonstrate with the small, real open-source repo `expressjs/express` and generate a six-month changelog.
 
 ```bash
-# Generate changelog for a repository
-node src/cli.js --repo owner/repo
+# 1. Clone the monorepo (CLI + viewer in one place)
+git clone https://github.com/rafizbd912/my-cool-docs.git
+cd my-cool-docs
 
-# Limit to last 20 commits
-node src/cli.js --repo owner/repo --max 20
+# 2. Install all deps (CLI + site)
+npm install   # or pnpm / yarn
 
-# Example
-node src/cli.js --repo microsoft/vscode --max 10
+# 3. Set your secrets once per shell
+export OPENAI_API_KEY="sk-…"
+export GITHUB_TOKEN="ghp_…"
+
+# 4. Generate a changelog – 1 Jan → 30 Jun 2023, max 100 commits
+node src/cli.js \
+  --repo expressjs/express \
+  --since 2023-01-01 \
+  --until 2023-06-30 \
+  --max 100 \
+  > public/CHANGELOG.md      # viewer reads from /public
+
+# 5. Run the docs site locally
+npm run dev                  # ▶ http://localhost:3000
+
+# 6. (optional) Produce static HTML for any host
+npm run build
+npm run export               # → ./out/ with plain HTML/CSS
 ```
 
-### Options
+That's it—one repo, one command to write markdown, one command to view it.
 
-- `--repo, -r <owner/repo>` (required) - GitHub repository in format "owner/repo"
-- `--max, -m <number>` (optional) - Maximum number of commits to process
+> **Why `expressjs/express`?**  ~1 700 commits yet only a few megabytes to fetch, so you see the date-range flags without waiting forever.  Swap in any other repo; just adjust `--repo`, `--since`, `--until`.
 
-### Requirements
+---
 
-- **OpenAI API Key**: Get from [OpenAI Platform](https://platform.openai.com/api-keys)
-- **GitHub Token**: Get from [GitHub Settings](https://github.com/settings/tokens)
-  - For public repos: needs `public_repo` scope
-  - For private repos: needs `repo` scope
+## ⌨️  CLI reference
 
-## Tech Stack
+```bash
+node src/cli.js --repo owner/name [options]
 
-- **Framework**: Next.js 14 with App Router
-- **Styling**: Tailwind CSS with Typography plugin
-- **Language**: TypeScript
-- **CLI**: Commander.js, Octokit, OpenAI
-- **Theme System**: Data-attribute based dark mode with persistent storage
+Options:
+  -r, --repo <owner/repo>   (required) target repository
+  -m, --max  <number>       limit number of commits (default 100)
+  -s, --since <YYYY-MM-DD>  only commits after this date
+  -u, --until <YYYY-MM-DD>  only commits before this date
+```
 
-## Architecture Overview
+The tool prints **pure markdown**; redirect wherever you like.
 
-This project uses Next.js 14 App Router, which replaces the traditional `_app.js` approach:
+---
 
-### App Router Equivalent to Pages Router
-- **`app/layout.tsx`** - Root layout (replaces `_app.js`)
-  - Imports global CSS
-  - Wraps all pages in LayoutWrapper
-  - Sets initial `data-theme` attribute on `<html>` tag
-- **`app/components/LayoutWrapper.tsx`** - Main layout wrapper
-  - Provides consistent layout structure for all pages
-  - Includes ThemeProvider for theme management
-- **`app/components/ThemeProvider.tsx`** - Theme management
-  - Handles `data-theme` attribute switching
-  - Manages localStorage persistence
-  - Responds to system theme changes
+## 🖥  Viewer highlights
 
-### Theme System
-- Uses `data-theme="light|dark"` on `<html>` element
-- Tailwind configured with `darkMode: ['attribute', 'data-theme', 'dark']`
-- CSS variables defined per theme in `globals.css`
-- Persistent theme storage with system preference fallback
+* Next 14 App Router
+* Tailwind 3 + daisyUI "forest" dark theme
+* Sticky sidebar with automatic version anchors
+* Badges (`New` / `Enhancement` / `Fix`) + copy-link anchors on hover
+* Fully static – `next export` deploys to GitHub Pages, Netlify, S3, etc.
 
-### Markdown Rendering
-- **`app/changelog/page.tsx`** - Server component that reads `CHANGELOG.md`
-  - Equivalent to `getStaticProps` functionality in Pages Router
-  - Uses `react-markdown` with `remark-gfm` for GitHub Flavored Markdown
-  - Code blocks get proper language classes for Prism integration
-  - Styled with `prose lg:prose-xl` from @tailwindcss/typography
+---
 
-## Learn More
+## 📝 License
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+[MIT](LICENSE)
