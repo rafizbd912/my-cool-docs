@@ -69,7 +69,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:mt-0 mt-16
       `}>
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full sticky top-16">
           {/* Sidebar Header - only visible on mobile */}
           <div className="lg:hidden p-4 border-b border-gray-700">
             <div className="flex items-center justify-between">
@@ -87,7 +87,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4">
+          <nav className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-1">
               {navLinks.map((link) => {
                 const isActive = currentHash === link.href || (link.href === '#changelog' && currentHash === '')
