@@ -3,19 +3,19 @@
 > AI-powered CLI **and** sleek Next.js viewer for beautifully formatted changelogs.
 
 ---
-## 🎥 Demo
+## Demo
 
 Watch the demo video: [rafiz-changelog-maker walk-through](https://drive.google.com/file/d/1hIvVQxyaGy-qwsv5wmGYMdfb8gqPGwlL/view?usp=sharing)
 
 
-## ✨ What you get
+## What you get
 
 | Part | Purpose |
 |------|---------|
 | **`src/cli.js`** | Node CLI that fetches Git commits, sends them to OpenAI, and prints a Stripe-style `CHANGELOG.md`. |
 | **`app/`**      | Next 14 + Tailwind + daisyUI app that renders that markdown as a dark-themed docs site. |
 
-## 📦 Requirements
+## Requirements
 
 * Node ≥ 18
 * An **OpenAI API key** – `OPENAI_API_KEY`
@@ -25,7 +25,7 @@ Watch the demo video: [rafiz-changelog-maker walk-through](https://drive.google.
 
 ---
 
-## 🚀 Quick-start (clone-and-run workflow)
+## Quick-start (clone-and-run workflow)
 
 We'll demonstrate with the small, real open-source repo `expressjs/express` and generate a six-month changelog.
 
@@ -78,8 +78,27 @@ Options:
 The tool prints **pure markdown**; redirect wherever you like.
 
 ---
+## Why these technical & product decisions?
 
-## 🖥  Viewer highlights
+| Area | Choice | Rationale |
+|------|--------|-----------|
+| **Framework** | **Next.js 14 (App Router)** | Modern React server-components, built-in MDX, easy `next export` to static hosting. |
+| **Styling** | **Tailwind CSS 3** | Utility-first means zero context-switch between HTML and CSS; the typography plugin gives beautiful default markdown styles. |
+| Theme layer | **daisyUI "forest"** | Instantly provides an accessible dark palette without designing colour tokens from scratch. Easy to swap (`data-theme="forest"`). |
+| Sidebar UX | **Sticky + auto-generated anchors** | Readers always know where they are; no manual TOC maintenance—headings drive navigation. |
+| Badges & anchors | Small coloured pills + copy-link 🔗 | Fast visual scan of change type, one-click share of any section. |
+| **CLI** | Node, Commander.js, Octokit | Zero dependencies for the user beyond Node; Octokit makes authenticated GitHub calls trivial. |
+| AI provider | **OpenAI Chat Completion** | Best summarisation quality per cost; one request per changelog keeps latency low. |
+| Date filters | `--since / --until` | Most changelogs are tied to release periods, not "last N commits". |
+| Output | Pure Markdown | Plays nicely with GitHub releases, npm package READMEs, and static sites like this viewer. |
+
+These choices keep the project **friction-free** for two personas:
+
+1. *Docs consumers* → get a fast, dark-themed site that works even if JavaScript is disabled because it's fully prerendered.
+2. *CLI users* → run one command, paste two API keys, and receive production-ready markdown—no vendor lock-in.
+---
+
+## Viewer highlights
 
 * Next 14 App Router
 * Tailwind 3 + daisyUI "forest" dark theme
@@ -92,3 +111,6 @@ The tool prints **pure markdown**; redirect wherever you like.
 ## 📝 License
 
 [MIT](LICENSE)
+
+## AI Usage
+Cursor Pro and ChatGPT for coding help and brainstorming.
