@@ -17,7 +17,7 @@ const openai = new OpenAI({
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
   request: {
-    timeout: 30000, // 30 seconds timeout
+    timeout: 3000, // 30 seconds timeout
   },
 });
 
