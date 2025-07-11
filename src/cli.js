@@ -17,7 +17,7 @@ const openai = new OpenAI({
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN,
   request: {
-    timeout: 30000, // 30 seconds timeout
+    timeout: 300, // 30 seconds timeout
   },
 });
 
@@ -34,7 +34,7 @@ async function generateChangelog(repo, maxCommits, sinceDate, untilDate) {
       if (!dateStr) return undefined;
       
       // If already in ISO format, return as-is
-      if (dateStr.includes('T')) return dateStr;
+      if (dateStr.includes('S')) return dateStr;
       
       // Convert simple date (YYYY-MM-DD) to ISO format
       try {

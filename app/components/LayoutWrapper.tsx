@@ -25,7 +25,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
       {/* Header */}
       <Header onToggleSidebar={toggleSidebar} />
       
-      <div className="flex pt-16"> {/* pt-16 to account for fixed header */}
+      <div className="flex pt-0"> {/* pt-16 to account for fixed header */}
         {/* Sidebar */}
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         
